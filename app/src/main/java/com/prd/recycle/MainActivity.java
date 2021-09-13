@@ -37,20 +37,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        startBtn = findViewById(R.id.btn_enter);
+        startBtn.setOnClickListener(this);
         views = new ArrayList<View>();
 
         // 初始化引导页视图列表
         for (int i = 0; i < pics.length; i++) {
             View view = LayoutInflater.from(this).inflate(pics[i], null);
-
-            if (i == pics.length - 1) {
-                startBtn = (Button) view.findViewById(R.id.btn_enter);
-                startBtn.setTag("enter");
-                startBtn.setOnClickListener(this);
-            }
-
             views.add(view);
-
         }
 
         vp = (ViewPager) findViewById(R.id.vp_guide);
@@ -122,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void setCurDot(int position) {
         if (position < 0 || position > pics.length || currentIndex == position) {
             return;
+        } else if (position == pics.length-1) {
+            startBtn.setVisibility(View.VISIBLE);
         }
         dots[position].setEnabled(true);
         dots[currentIndex].setEnabled(false);
@@ -130,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        if (v.getTag().equals("enter")) {
+        if (v.getId() == R.id.btn_enter) {
             enterWebActivity();
             return;
         }
