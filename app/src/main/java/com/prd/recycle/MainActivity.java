@@ -1,16 +1,24 @@
 package com.prd.recycle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.PersistableBundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
+import android.text.style.ClickableSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -37,7 +45,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
         if (sp.getBoolean("FIRST_OPEN", false)) {
-            enterWebActivity();
+            if (!sp.getBoolean("PROTOCOL", false)) {
+                showDialog(this);
+            } else {
+                enterWebActivity("", "https://h5.yqhuan.com/");
+            }
         }
         setContentView(R.layout.activity_main);
 
@@ -131,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_enter) {
-            enterWebActivity();
+            enterWebActivity("FIRST_OPEN", "https://h5.yqhuan.com/");
             return;
         }
 
@@ -141,12 +153,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void enterWebActivity() {
+    private void enterWebActivity(String param, String url) {
         Intent intent = new Intent(MainActivity.this,
                 WebActivity.class);
+        intent.setAction(url);
         startActivity(intent);
-        SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
-        sp.edit().putBoolean("FIRST_OPEN", true).commit();
+        if ("".equals(param)) {
+            SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+            sp.edit().putBoolean(param, true).commit();
+        }
         finish();
     }
 
@@ -174,5 +189,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             setCurDot(position);
         }
 
+    }
+    private MyDialog myDialog;
+    private void showDialog(Context context){
+        myDialog=new MyDialog(MainActivity.this,R.style.MyDialog);
+//        myDialog.setTitle("《隐私政策》和《用户协议》");
+//        myDialog.setMessage("欢迎使用通通回收。在您访问通通回收、使用通通回收服务前，您需要通过点击同意的方式在线签署相关协议。请您务必仔细阅限读、充分理解协议的条款内容后再点击同意(特别是以加粗或下划线方式标注的条款，因为这些条款可能会明确您应履行的义务或对您的权利有所限制)。");
+        myDialog.setYesOnclickListener("确定", new MyDialog.onYesOnclickListener() {
+            @Override
+            public void onYesOnclick() {
+                SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+                sp.edit().putBoolean("PROTOCOL", true).commit();
+                myDialog.dismiss();
+            }
+        });
+//        myDialog.setNoOnclickListener("取消", new MyDialog.onNoOnclickListener() {
+//            @Override
+//            public void onNoClick() {
+//                myDialog.dismiss();
+//                finish();
+//            }
+//        });
+        SpannableString span = new SpannableString("我已阅读并同意《隐私政策》和《用户协议》");
+        span.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                enterWebActivity("", "https://h5.yqhuan.com/#/pages/about/about?type=3");
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setColor(Color.parseColor("#5693e2"));
+                ds.setUnderlineText(false);
+            }
+        }, 8, 13, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        span.setSpan(new ClickableSpan() {
+            @Override
+            public void onClick(@NonNull View widget) {
+                enterWebActivity("", "https://h5.yqhuan.com/#/pages/about/about?type=1");
+            }
+
+            @Override
+            public void updateDrawState(@NonNull TextPaint ds) {
+                super.updateDrawState(ds);
+                ds.setColor(Color.parseColor("#5693e2"));
+                ds.setUnderlineText(false);
+            }
+        }, 15, 20, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        myDialog.setSpannableString(span);
+        myDialog.setCheckBoxListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                myDialog.setButtonEnbale(isChecked);
+            }
+        });
+        myDialog.setCanceledOnTouchOutside(false);
+        myDialog.setCancelable(false);
+        myDialog.show();
     }
 }
