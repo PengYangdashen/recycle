@@ -35,6 +35,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
+        if (sp.getBoolean("FIRST_OPEN", false)) {
+            enterWebActivity();
+        }
         setContentView(R.layout.activity_main);
 
         startBtn = findViewById(R.id.btn_enter);
