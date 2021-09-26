@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,9 +16,12 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -26,10 +30,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private static final String TAG = "MainActivity";
     private ViewPager vp;
     private GuideViewPagerAdapter adapter;
     private List<View> views;
     private Button startBtn;
+    private boolean choosen = false;
 
     // 引导页图片资源
     private static final int[] pics = { R.layout.guid_view1,
@@ -43,15 +50,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN|View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
+        setContentView(R.layout.activity_main);
         SharedPreferences sp = getSharedPreferences("config", MODE_PRIVATE);
         if (sp.getBoolean("FIRST_OPEN", false)) {
             if (!sp.getBoolean("PROTOCOL", false)) {
-                showDialog(this);
+                Intent intent = new Intent(MainActivity.this, SpannableActivity.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.anim1, R.anim.anim2);
             } else {
                 enterWebActivity("", "https://h5.yqhuan.com/");
             }
         }
-        setContentView(R.layout.activity_main);
 
         startBtn = findViewById(R.id.btn_enter);
         startBtn.setOnClickListener(this);
@@ -142,6 +152,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        Log.i(TAG, "onClick: ");
         if (v.getId() == R.id.btn_enter) {
             enterWebActivity("FIRST_OPEN", "https://h5.yqhuan.com/");
             return;
@@ -192,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
     private MyDialog myDialog;
     private void showDialog(Context context){
-        myDialog=new MyDialog(MainActivity.this,R.style.MyDialog);
+        myDialog=new MyDialog(context,R.style.MyDialog);
 //        myDialog.setTitle("《隐私政策》和《用户协议》");
 //        myDialog.setMessage("欢迎使用通通回收。在您访问通通回收、使用通通回收服务前，您需要通过点击同意的方式在线签署相关协议。请您务必仔细阅限读、充分理解协议的条款内容后再点击同意(特别是以加粗或下划线方式标注的条款，因为这些条款可能会明确您应履行的义务或对您的权利有所限制)。");
         myDialog.setYesOnclickListener("确定", new MyDialog.onYesOnclickListener() {
@@ -238,14 +249,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }, 15, 20, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         myDialog.setSpannableString(span);
-        myDialog.setCheckBoxListener(new CompoundButton.OnCheckedChangeListener() {
+        myDialog.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                myDialog.setButtonEnbale(isChecked);
+            public void onClick(View v) {
+                Log.i(TAG, "onClick: ");
+                if (v.getId() == R.id.cb) {
+                    choosen = !choosen;
+                    myDialog.setButtonEnbale(choosen);
+                }
             }
         });
         myDialog.setCanceledOnTouchOutside(false);
         myDialog.setCancelable(false);
         myDialog.show();
+        Log.i(TAG, "showDialog: ");
     }
 }

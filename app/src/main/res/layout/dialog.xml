@@ -26,6 +26,7 @@
             android:layout_marginLeft="20dp"
             android:layout_margin="10dp"
             android:layout_marginRight="20dp"
+            android:textColor="#333333"
             android:layout_gravity="center"
             android:text="欢迎使用通通回收。在您访问通通回收、使用通通回收服务前，您需要通过点击同意的方式在线签署相关协议。请您务必仔细阅限读、充分理解协议的条款内容后再点击同意(特别是以加粗或下划线方式标注的条款，因为这些条款可能会明确您应履行的义务或对您的权利有所限制)。"/>
         <LinearLayout
@@ -33,12 +34,13 @@
             android:orientation="horizontal"
             android:layout_margin="10dp"
             android:layout_height="wrap_content">
-            <CheckBox
+            <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:background="@drawable/selector_cv"
-                android:button="@null"
+                android:src="@drawable/gou"
                 android:checked="false"
+                android:focusable="true"
+                android:clickable="true"
                 android:id="@+id/cb"/>
             <TextView
                 android:id="@+id/protocol"
@@ -46,15 +48,15 @@
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
                 android:textColor="#bdbdbd"
-                android:text="我已阅读并同意《隐私政策》和《用户协议》"/>
+                android:text=""/>
         </LinearLayout>
             <Button
                 android:id="@+id/yes"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
+                android:layout_height="40dp"
                 android:background="@drawable/selector_button"
                 android:text="确定"
-                android:enabled="false"
+                android:enabled="true"
                 android:textColor="#ffffff"
                 android:textSize="16sp"/>
     </LinearLayout>

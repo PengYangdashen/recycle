@@ -5,10 +5,13 @@ import android.content.Context;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,11 +23,12 @@ import androidx.annotation.StyleRes;
  */
 
 public class MyDialog extends Dialog {
+    private static final String TAG = "MyDialog";
     private Button yes;//确定按钮
 //    private Button no;//取消按钮
     private TextView titleTV;//消息标题文本
     private TextView message;//消息提示文本
-    private CheckBox checkBox;//
+    private ImageView imageView;//
     private TextView protocol;//
     private String titleStr;//从外界设置的title文本
     private String messageStr;//从外界设置的消息文本
@@ -35,6 +39,10 @@ public class MyDialog extends Dialog {
 
     public MyDialog(@NonNull Context context, @StyleRes int themeResId) {
         super(context, themeResId);
+        Log.i(TAG, "MyDialog: ");
+
+        //初始化界面控件
+        initView(context);
     }
 
     /**
@@ -50,8 +58,9 @@ public class MyDialog extends Dialog {
         this.noOnclickListener = onNoOnclickListener;
     }
 
-    public void setCheckBoxListener(CompoundButton.OnCheckedChangeListener listener) {
-        checkBox.setOnCheckedChangeListener(listener);
+    public void setOnClickListener(View.OnClickListener listener) {
+        Log.i(TAG, "setCheckBoxListener: ");
+        imageView.setOnClickListener(listener);
     }
 
     /**
@@ -68,83 +77,32 @@ public class MyDialog extends Dialog {
     }
 
     public void setSpannableString (SpannableString spannableString) {
+        Log.i(TAG, "setSpannableString: " + spannableString.toString());
         protocol.setText(spannableString);
         protocol.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
-    public void setButtonEnbale(boolean enbale) {
-        yes.setEnabled(enbale);
+    public void setButtonEnbale(boolean enable) {
+        Log.i(TAG, "setButtonEnbale: " + enable);
+        yes.setEnabled(enable);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dialog);
-        //空白处不能取消动画
-        setCanceledOnTouchOutside(false);
-
-        //初始化界面控件
-        initView();
-
-        //初始化界面数据
-        initData();
-        //初始化界面控件的事件
-        initEvent();
     }
 
     /**
      * 初始化界面控件
      */
-    private void initView() {
-        yes = findViewById(R.id.yes);
-        titleTV = (TextView) findViewById(R.id.title);
-        message = (TextView) findViewById(R.id.message);
-        checkBox = findViewById(R.id.cb);
-        protocol = findViewById(R.id.protocol);
-    }
-
-    /**
-     * 初始化界面控件的显示数据
-     */
-    private void initData() {
-        //如果用户自定了title和message
-        if (titleStr != null) {
-            titleTV.setText(titleStr);
-        }
-        if (messageStr != null) {
-            message.setText(messageStr);
-        }
-        //如果设置按钮文字
-        if (yesStr != null) {
-            yes.setText(yesStr);
-        }
-        if (noStr != null) {
-//            no.setText(noStr);
-        }
-    }
-
-    /**
-     * 初始化界面的确定和取消监听
-     */
-    private void initEvent() {
-        //设置确定按钮被点击后，向外界提供监听
-        yes.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (yesOnclickListener != null) {
-                    yesOnclickListener.onYesOnclick();
-                }
-            }
-        });
-        //设置取消按钮被点击后，向外界提供监听
-//        no.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (noOnclickListener != null) {
-//                    noOnclickListener.onNoClick();
-//                }
-//            }
-//        });
+    private void initView(Context context) {
+        View view = LayoutInflater.from(context).inflate(R.layout.dialog, null, false);
+        yes = view.findViewById(R.id.yes);
+        titleTV = (TextView) view.findViewById(R.id.title);
+        message = (TextView) view.findViewById(R.id.message);
+        imageView = view.findViewById(R.id.cb);
+        protocol = view.findViewById(R.id.protocol);
     }
 
     /**

@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.JsResult;
@@ -27,6 +28,7 @@ public class WebActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().getDecorView().setSystemUiVisibility( View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN| View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR);
         setContentView(R.layout.activity_web);
         sp = getSharedPreferences("aaa", MODE_PRIVATE);
 
@@ -59,7 +61,7 @@ public class WebActivity extends AppCompatActivity {
         });
 
         synCookies(this, sp.getString("cook", ""));
-        mWebView.loadUrl("https://h5.yqhuan.com/");
+        mWebView.loadUrl(getIntent().getAction());
     }
     final Context myApp = this;
 
